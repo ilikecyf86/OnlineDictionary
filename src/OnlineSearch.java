@@ -9,6 +9,7 @@ import java.io.IOException;
  */
 public class OnlineSearch {
     public static void main(String args[]){
+        //baidu youdao bing
         String s = searchYoudao("part");
         System.out.println(s);
     }
