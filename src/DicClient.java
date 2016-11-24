@@ -62,9 +62,15 @@ public class DicClient implements DicConstants{
             //like baidu example
             toServer.writeInt(LIKE);
             toServer.writeInt(BAIDU);
+            String word = "car";
+            toServer.writeInt(word.length());
+            toServer.writeChars(word);
 
             //get like numbers example
             toServer.writeInt(GETRANK);
+            word = "word";
+            toServer.writeInt(word.length());
+            toServer.writeChars(word);
             int []likes = new int[NUMOFDICS];
             for(int i = 0; i < likes.length; i++){
                 likes[i] = fromServer.readInt();

@@ -110,10 +110,16 @@ public class DicServer extends JFrame implements DicConstants{
                             break;
                         case LIKE:
                             int type = inputFromClient.readInt();
+                            int wordLen = inputFromClient.readInt();
+                            char[] wordC = new char[wordLen];
+                            for(int i = 0; i < wordLen; i++){
+                                wordC[i] = inputFromClient.readChar();
+                            }
+                            String word = new String(wordC);
                             switch (type){
                                 case BAIDU:
-                                    DBConnect_likeNum.likeBaidu();
-                                    jta.append("Client No." + num + " liked: baidu\n");
+                                    DBConnect_likeNum.likeBaidu(word);
+                                    jta.append("Client No." + num + " liked: baidu for word: " + word + "\n");
                                     break;
                                 case YOUDAO:
                                     DBConnect_likeNum.likeYoudao();
@@ -128,9 +134,15 @@ public class DicServer extends JFrame implements DicConstants{
                             }
                             break;
                         case GETRANK:
+                            int wordLenRank = inputFromClient.readInt();
+                            char[] wordRankC = new char[wordLenRank];
+                            for(int i = 0; i < wordLenRank; i++){
+                                wordRankC[i] = inputFromClient.readChar();
+                            }
+                            String wordRank = new String(wordRankC);
                             int[] result = new int[NUMOFDICS];
-                            result = DBConnect_likeNum.getLikes();
-                            jta.append("Client No." + num + " got the like numbers\n");
+                            result = DBConnect_likeNum.getLikes(wordRank);
+                            jta.append("Client No." + num + " got the like numbers for word: " + wordRank + "\n");
                             for(int i = 0; i < result.length; i++)
                                 outputToClient.writeInt(result[i]);
                             break;
