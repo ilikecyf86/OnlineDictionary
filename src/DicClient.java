@@ -68,7 +68,7 @@ public class DicClient implements DicConstants{
 
             //get like numbers example
             toServer.writeInt(GETRANK);
-            word = "word";
+            word = "no";
             toServer.writeInt(word.length());
             toServer.writeChars(word);
             int []likes = new int[NUMOFDICS];
