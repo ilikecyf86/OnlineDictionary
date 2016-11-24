@@ -59,20 +59,24 @@ public class DBConnect_likeNum {
         disconnectDB();
     }
 
-    public static void likeYoudao(){
+    public static void likeYoudao(String word){
         connectDB();
         ResultSet rs;
         try {
             Statement statement = connection.createStatement();
             //statement.executeUpdate("create table if not exists likes(dicName VARCHAR(16) not null, num INTEGER DEFAULT 0, PRIMARY KEY (dicName))");
             String dicName = "youdao";
-            rs = statement.executeQuery("select num from likes where dicName = '"+ dicName +"'");
-            int likeNum = -1;
-            while(rs.next())
-                likeNum = rs.getInt("num");
-            //System.out.println(likeNum);
-            likeNum++;
-            statement.executeUpdate("update likes set num = " + likeNum + " where dicName = '"+ dicName +"'");
+            rs = statement.executeQuery("select " + dicName + " from likes where word = '"+ word +"'");
+            if(rs.next() == false){
+                statement.executeUpdate("insert into likes(word, baidu, youdao, bing) values('" + word + "', 1, 0, 0)");
+            }
+            else {
+                int likeNum = -1;
+                likeNum = rs.getInt(dicName);
+                //System.out.println(likeNum);
+                likeNum++;
+                statement.executeUpdate("update likes set " + dicName + " = " + likeNum + " where word = '" + word + "'");
+            }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,"数据库连接错误");
             e.printStackTrace();
@@ -80,20 +84,24 @@ public class DBConnect_likeNum {
         disconnectDB();
     }
 
-    public static void likeBing(){
+    public static void likeBing(String word){
         connectDB();
         ResultSet rs;
         try {
             Statement statement = connection.createStatement();
             //statement.executeUpdate("create table if not exists likes(dicName VARCHAR(16) not null, num INTEGER DEFAULT 0, PRIMARY KEY (dicName))");
             String dicName = "bing";
-            rs = statement.executeQuery("select num from likes where dicName = '"+ dicName +"'");
-            int likeNum = -1;
-            while(rs.next())
-                likeNum = rs.getInt("num");
-            //System.out.println(likeNum);
-            likeNum++;
-            statement.executeUpdate("update likes set num = " + likeNum + " where dicName = '"+ dicName +"'");
+            rs = statement.executeQuery("select " + dicName + " from likes where word = '"+ word +"'");
+            if(rs.next() == false){
+                statement.executeUpdate("insert into likes(word, baidu, youdao, bing) values('" + word + "', 1, 0, 0)");
+            }
+            else {
+                int likeNum = -1;
+                likeNum = rs.getInt(dicName);
+                //System.out.println(likeNum);
+                likeNum++;
+                statement.executeUpdate("update likes set " + dicName + " = " + likeNum + " where word = '" + word + "'");
+            }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,"数据库连接错误");
             e.printStackTrace();
