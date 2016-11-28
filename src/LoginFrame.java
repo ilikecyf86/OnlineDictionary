@@ -4,10 +4,13 @@
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Socket;
 
 public class LoginFrame extends JFrame {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         LoginFrame lf = new LoginFrame();
         lf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         lf.setVisible(true);
@@ -19,7 +22,13 @@ public class LoginFrame extends JFrame {
     private JTextField usernameText = new JTextField(18);
     private JPasswordField passwordText = new JPasswordField(18);
 
-    public LoginFrame() {
+    public LoginFrame() throws IOException {
+        /* 客户端连接服务器 */
+        Socket socket = new Socket("172.26.88.169", 8000);
+        DataOutputStream toServer = new DataOutputStream(socket.getOutputStream());
+        DataInputStream fromServer = new DataInputStream(socket.getInputStream());
+        System.out.print("Connected.");
+
         panel.setLayout(new GridLayout(3, 1));
         panel.setBorder(BorderFactory.createEtchedBorder());
 
@@ -53,22 +62,23 @@ public class LoginFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "请输入用户名！", "WARNING", JOptionPane.WARNING_MESSAGE);
             else if (password.length() <= 0)
                 JOptionPane.showMessageDialog(this, "请输入密码！", "WARNING", JOptionPane.WARNING_MESSAGE);
-            else try {
+            else {
+                try {
                     DicClient client = new DicClient(username, password);
-                /* 检测用户名密码是否存在且匹配 */
-                    boolean loginFlag = client.login();
+                    /* 检测用户名密码是否存在且匹配 */
+                    boolean loginFlag = client.login(toServer, fromServer);
                     if (loginFlag) {
-                        DictionaryFrame df = new DictionaryFrame(client);
+                        DictionaryFrame df = new DictionaryFrame(client, toServer);
                         df.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                         df.setVisible(true);
                         dispose();
-                    }
-                    else
+                    } else
                         JOptionPane.showMessageDialog(this, "用户名或密码错误！", "ERROR", JOptionPane.ERROR_MESSAGE);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-            passwordText.setText("");
+                passwordText.setText("");
+            }
         });
 
         register.addActionListener(e -> {
@@ -78,27 +88,28 @@ public class LoginFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "请输入用户名！", "WARNING", JOptionPane.WARNING_MESSAGE);
             else if (password.length() <= 0)
                 JOptionPane.showMessageDialog(this, "请输入密码！", "WARNING", JOptionPane.WARNING_MESSAGE);
-            else try {
+            else {
+                try {
                     DicClient client = new DicClient(username, password);
                     boolean flagUsername = true;
-                /* 检测用户名是否符合规范 */
+                    /* 检测用户名是否符合规范 */
                     boolean checkUsername = judgeUsername(username);
                     if (!checkUsername) {
                         flagUsername = false;
                         JOptionPane.showMessageDialog(this, "用户名不符合规范！", "WARNING", JOptionPane.WARNING_MESSAGE);
                     }
-                /* 检测用户名是否存在 */
-                    else if (!client.nameCheck()) {
+                    /* 检测用户名是否存在 */
+                    else if (!client.nameCheck(toServer, fromServer)) {
                         flagUsername = false;
                         JOptionPane.showMessageDialog(this, "用户名已被注册！", "WARNING", JOptionPane.WARNING_MESSAGE);
                     }
                     if (flagUsername) {
-                    /* 检测密码是否符合规范 */
+                        /* 检测密码是否符合规范 */
                         boolean checkPassword = judgePassword(password);
-                        if(!checkPassword)
+                        if (!checkPassword)
                             JOptionPane.showMessageDialog(this, "密码不符合规范！", "WARNING", JOptionPane.WARNING_MESSAGE);
                         else {
-                            if (!client.register())
+                            if (!client.register(toServer, fromServer))
                                 JOptionPane.showMessageDialog(this, "注册失败！", "ERROR", JOptionPane.ERROR_MESSAGE);
                             else
                                 JOptionPane.showMessageDialog(this, "注册成功！", "COMPLETE", JOptionPane.INFORMATION_MESSAGE);
@@ -107,7 +118,8 @@ public class LoginFrame extends JFrame {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-            passwordText.setText("");
+                passwordText.setText("");
+            }
         });
     }
 
