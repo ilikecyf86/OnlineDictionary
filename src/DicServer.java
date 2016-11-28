@@ -122,11 +122,11 @@ public class DicServer extends JFrame implements DicConstants{
                                     jta.append("Client No." + num + " liked: baidu for word: " + word + "\n");
                                     break;
                                 case YOUDAO:
-                                    DBConnect_likeNum.likeYoudao();
+                                    DBConnect_likeNum.likeYoudao(word);
                                     jta.append("Client No." + num + " liked: youdao\n");
                                     break;
                                 case BING:
-                                    DBConnect_likeNum.likeBing();
+                                    DBConnect_likeNum.likeBing(word);
                                     jta.append("Client No." + num + " liked: bing\n");
                                     break;
                                 default:

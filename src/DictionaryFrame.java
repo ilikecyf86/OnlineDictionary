@@ -6,13 +6,10 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class DictionaryFrame extends JFrame {
-    public static void main(String[] args) {
-        ;
-    }
-
     private JPanel panel = new JPanel();
     private JLabel title = new JLabel("英汉在线词典", JLabel.CENTER);
     private JTextField input = new JTextField(25);
@@ -31,7 +28,7 @@ public class DictionaryFrame extends JFrame {
     private JButton like2 = new JButton("❤");
     private JButton like3 = new JButton("❤");
 
-    public DictionaryFrame(DicClient client) {
+    public DictionaryFrame(DicClient client, DataOutputStream toServer) {
         panel.setLayout(new GridLayout(4, 1));
         panel.setBorder(BorderFactory.createEtchedBorder());
 
@@ -132,7 +129,7 @@ public class DictionaryFrame extends JFrame {
             else if (!(checkBaidu.isSelected() || checkYoudao.isSelected() || checkBing.isSelected()))
                 JOptionPane.showMessageDialog(this, "请选择词典！", "ERROR", JOptionPane.WARNING_MESSAGE);
             else {
-                String[] dicSortAsLike = { "有道", "必应", "百度", "空" };  //服务器返回按赞数排序的词典
+                String[] dicSortAsLike = { "百度", "有道", "必应", "空" };  //服务器返回按赞数排序的词典
                 for (int i = 0; i < 3; i++)
                     if (!checkBaidu.isSelected() && dicSortAsLike[i] == "百度")
                         for (int j = i; j < 3; j++)
@@ -225,7 +222,7 @@ public class DictionaryFrame extends JFrame {
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
                 try {
-                    client.logout();
+                    client.logout(toServer);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
