@@ -8,7 +8,7 @@ import java.io.DataOutputStream;
 public class DicClient implements DicConstants {
     public String username;
     private String password;
-    private boolean online;
+    public boolean online;
 
     public DicClient(String usernameData, String passwordData) throws IOException {
         username = usernameData;

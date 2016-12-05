@@ -4,14 +4,25 @@
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class DictionaryFrame extends JFrame {
+    public static void main(String[] args) {
+        DictionaryFrame df = new DictionaryFrame();
+        df.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        df.setVisible(true);
+    }
+
     private JPanel panel = new JPanel();
-    private JLabel title = new JLabel("英汉在线词典", JLabel.CENTER);
+    private JLabel title = new JLabel("欢迎使用英汉在线词典", JLabel.CENTER);
+    private JLabel version = new JLabel("版本号 v1.21", JLabel.CENTER);
+    private JLabel greeting = new JLabel("你好，请", JLabel.CENTER);
+    private JButton login = new JButton("登陆");
     private JTextField input = new JTextField(25);
     private JButton searchButton = new JButton("search");
     private JCheckBox checkBaidu = new JCheckBox("百度");
@@ -28,35 +39,42 @@ public class DictionaryFrame extends JFrame {
     private JButton like2 = new JButton("❤");
     private JButton like3 = new JButton("❤");
 
-    public DictionaryFrame(DicClient client, DataOutputStream toServer) {
+    private LoginFrame loginFrame = null;
+    private boolean ifLogin;
+
+    public DictionaryFrame() {
         panel.setLayout(new GridLayout(4, 1));
         panel.setBorder(BorderFactory.createEtchedBorder());
 
         JPanel panelHead = new JPanel();
-        panelHead.setLayout(new GridLayout(3, 1));
+        panelHead.setLayout(new GridLayout(4, 1));
         panelHead.setBorder(BorderFactory.createEtchedBorder());
-        title.setText("欢迎使用英汉在线词典, " + client.username);
         panelHead.add(title);
-        JPanel panelInput = new JPanel();
-        panelInput.setLayout(new FlowLayout(FlowLayout.CENTER, 8, 5));
+
+        JPanel panelLineTwo = new JPanel(new GridLayout(1, 2));
+        panelLineTwo.add(version);
+        JPanel panelLogin = new JPanel();
+        panelLogin.add(greeting);
+        panelLogin.add(login);
+        panelLineTwo.add(panelLogin);
+        panelHead.add(panelLineTwo);
+
+        JPanel panelInput = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 5));
         searchButton.setBackground(Color.CYAN);
-        like1.setBackground(Color.PINK);
-        like2.setBackground(Color.PINK);
-        like3.setBackground(Color.PINK);
         panelInput.add(input);
         panelInput.add(searchButton);
         panelHead.add(panelInput);
-        JPanel panelSelect = new JPanel();
-        panelSelect.setLayout(new FlowLayout(FlowLayout.CENTER, 40, 5));
+
+        JPanel panelSelect = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 5));
         panelSelect.add(checkBaidu);
         panelSelect.add(checkYoudao);
         panelSelect.add(checkBing);
         panelSelect.add(checkAll);
         panelHead.add(panelSelect);
+
         panel.add(panelHead);
 
-        JPanel panelResult1 = new JPanel();
-        panelResult1.setLayout(new BorderLayout());
+        JPanel panelResult1 = new JPanel(new BorderLayout());
         panelResult1.setBorder(new TitledBorder("-"));
         panelResult1.add(resultJSP1, BorderLayout.WEST);
         like1.setBackground(Color.PINK);
@@ -64,8 +82,7 @@ public class DictionaryFrame extends JFrame {
         panelResult1.setVisible(false);
         panel.add(panelResult1);
 
-        JPanel panelResult2 = new JPanel();
-        panelResult2.setLayout(new BorderLayout());
+        JPanel panelResult2 = new JPanel(new BorderLayout());
         panelResult2.setBorder(new TitledBorder("-"));
         panelResult2.add(resultJSP2, BorderLayout.WEST);
         like2.setBackground(Color.PINK);
@@ -73,8 +90,7 @@ public class DictionaryFrame extends JFrame {
         panelResult2.setVisible(false);
         panel.add(panelResult2);
 
-        JPanel panelResult3 = new JPanel();
-        panelResult3.setLayout(new BorderLayout());
+        JPanel panelResult3 = new JPanel(new BorderLayout());
         panelResult3.setBorder(new TitledBorder("-"));
         panelResult3.add(resultJSP3, BorderLayout.WEST);
         like3.setBackground(Color.PINK);
@@ -82,13 +98,14 @@ public class DictionaryFrame extends JFrame {
         panelResult3.setVisible(false);
         panel.add(panelResult3);
 
+        ifLogin = false;
+
         add(panel);
         setTitle("英汉大词典");
-        setSize(400,500);
+        setSize(400,600);
         setLocation(200,200);
         setResizable(false);
 
-        /* 选中全选则自动勾选其它三个选项，取消全选则全部清空 */
         checkAll.addActionListener(e -> {
             if (checkAll.isSelected()) {
                 checkBaidu.setSelected(true);
@@ -102,7 +119,6 @@ public class DictionaryFrame extends JFrame {
             }
         });
 
-        /* 选中全部三个词典，则自动勾选全选 */
         checkBaidu.addActionListener(e ->  {
             if (checkBaidu.isSelected() && checkYoudao.isSelected() && checkBing.isSelected())
                 checkAll.setSelected(true);
@@ -125,11 +141,17 @@ public class DictionaryFrame extends JFrame {
         searchButton.addActionListener(e -> {
             String word = input.getText();
             if (word.length() <= 0)
-                JOptionPane.showMessageDialog(this, "请输入单词！", "ERROR", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "请输入单词！", "WARNING", JOptionPane.WARNING_MESSAGE);
+            else if (!judgeWord(word)) {
+                JOptionPane.showMessageDialog(this, "输入错误！请重新输入！", "WARNING", JOptionPane.WARNING_MESSAGE);
+                input.setText("");
+            }
             else if (!(checkBaidu.isSelected() || checkYoudao.isSelected() || checkBing.isSelected()))
-                JOptionPane.showMessageDialog(this, "请选择词典！", "ERROR", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "请选择词典！", "WARNING", JOptionPane.WARNING_MESSAGE);
             else {
-                String[] dicSortAsLike = { "百度", "有道", "必应", "空" };  //服务器返回按赞数排序的词典
+                String[] dicSortAsLike = { "百度", "有道", "必应", "空" };
+                if (ifLogin)
+                    /* 请求服务器返回按赞数排序的词典 */
                 for (int i = 0; i < 3; i++)
                     if (!checkBaidu.isSelected() && dicSortAsLike[i] == "百度")
                         for (int j = i; j < 3; j++)
@@ -142,7 +164,6 @@ public class DictionaryFrame extends JFrame {
                     if (!checkBing.isSelected() && dicSortAsLike[i] == "必应")
                         for (int j = i; j < 3; j++)
                             dicSortAsLike[j] = dicSortAsLike[j + 1];
-                //for (int i = 0; i < 3; i++)   System.out.println(dicSortAsLike[i]);
 
                 switch (dicSortAsLike[0]) {
                     case "百度":
@@ -216,17 +237,62 @@ public class DictionaryFrame extends JFrame {
             }
         });
 
-        /* 关闭词典时退出登陆 */
+        login.addActionListener(e -> {
+            try {
+                loginFrame = new LoginFrame();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            loginFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            loginFrame.setVisible(true);
+        });
+
+        like1.addActionListener(e -> {
+            if (!ifLogin)
+                JOptionPane.showMessageDialog(this, "请先登陆。", "FAILED", JOptionPane.INFORMATION_MESSAGE);
+            else {
+                ;
+            }
+        });
+        like2.addActionListener(e -> {
+            if (!ifLogin)
+                JOptionPane.showMessageDialog(this, "请先登陆。", "FAILED", JOptionPane.INFORMATION_MESSAGE);
+            else {
+                ;
+            }
+        });
+        like3.addActionListener(e -> {
+            if (!ifLogin)
+                JOptionPane.showMessageDialog(this, "请先登陆。", "FAILED", JOptionPane.INFORMATION_MESSAGE);
+            else {
+                ;
+            }
+        });
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                try {
-                    client.logout(toServer);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
+                if (ifLogin) {
+                    try {
+                        loginFrame.client.logout(loginFrame.toServer);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
         });
+    }
+
+    public boolean judgeWord(String word) {
+        for (int i = 0; i < word.length(); i++) {
+            if (word.charAt(i) >= 'a' && word.charAt(i) <= 'z')
+                continue;
+            else if (word.charAt(i) >= 'A' && word.charAt(i) <= 'Z')
+                continue;
+            else
+                return false;
+        }
+        return true;
     }
 }

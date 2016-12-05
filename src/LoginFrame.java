@@ -4,6 +4,8 @@
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -22,24 +24,29 @@ public class LoginFrame extends JFrame {
     private JTextField usernameText = new JTextField(18);
     private JPasswordField passwordText = new JPasswordField(18);
 
+    public DicClient client;
+    public Socket socket;
+    public DataOutputStream toServer;
+    public DataInputStream fromServer;
+
     public LoginFrame() throws IOException {
-        /* 客户端连接服务器 */
-        Socket socket = new Socket("172.26.88.169", 8000);
-        DataOutputStream toServer = new DataOutputStream(socket.getOutputStream());
-        DataInputStream fromServer = new DataInputStream(socket.getInputStream());
-        System.out.print("Connected.");
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                setVisible(false);
+            }
+        });
 
         panel.setLayout(new GridLayout(3, 1));
         panel.setBorder(BorderFactory.createEtchedBorder());
 
-        JPanel usernamePanel = new JPanel();
-        usernamePanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        JPanel usernamePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         usernamePanel.setBorder(new TitledBorder("用户名"));
         usernamePanel.add(usernameText);
         panel.add(usernamePanel);
 
-        JPanel passwordPanel = new JPanel();
-        passwordPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        JPanel passwordPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         passwordPanel.setBorder(new TitledBorder("密　码"));
         passwordPanel.add(passwordText);
         panel.add(passwordPanel);
@@ -50,9 +57,9 @@ public class LoginFrame extends JFrame {
         panel.add(buttonPanel);
 
         add(panel);
-        setTitle("英汉大词典");
+        setTitle("登陆&注册");
         setSize(250, 200);
-        setLocation(250, 250);
+        setLocation(275, 400);
         setResizable(false);
 
         login.addActionListener(e -> {
@@ -64,14 +71,17 @@ public class LoginFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "请输入密码！", "WARNING", JOptionPane.WARNING_MESSAGE);
             else {
                 try {
-                    DicClient client = new DicClient(username, password);
+                    client = new DicClient(username, password);
+                    /* 客户端连接服务器 */
+                    socket = new Socket("172.26.88.169", 8000);
+                    toServer = new DataOutputStream(socket.getOutputStream());
+                    fromServer = new DataInputStream(socket.getInputStream());
+                    System.out.print("Connected.");
                     /* 检测用户名密码是否存在且匹配 */
                     boolean loginFlag = client.login(toServer, fromServer);
                     if (loginFlag) {
-                        DictionaryFrame df = new DictionaryFrame(client, toServer);
-                        df.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                        df.setVisible(true);
-                        dispose();
+                        /* 登陆成功 */
+                        setVisible(false);
                     } else
                         JOptionPane.showMessageDialog(this, "用户名或密码错误！", "ERROR", JOptionPane.ERROR_MESSAGE);
                 } catch (IOException e1) {
@@ -90,7 +100,11 @@ public class LoginFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "请输入密码！", "WARNING", JOptionPane.WARNING_MESSAGE);
             else {
                 try {
-                    DicClient client = new DicClient(username, password);
+                    client = new DicClient(username, password);
+                    /* 客户端连接服务器 */
+                    socket = new Socket("172.26.88.169", 8000);
+                    toServer = new DataOutputStream(socket.getOutputStream());
+                    fromServer = new DataInputStream(socket.getInputStream());
                     boolean flagUsername = true;
                     /* 检测用户名是否符合规范 */
                     boolean checkUsername = judgeUsername(username);
@@ -128,7 +142,7 @@ public class LoginFrame extends JFrame {
     }
 
     public boolean judgePassword(String password) {
-        if (password.length() < 5 || password.length() > 16)
+        if (password.length() < 6 || password.length() > 16)
             return false;
         for (int i = 0; i < password.length(); i++) {
             if (password.charAt(i) >= '0' && password.charAt(i) <= '9')
