@@ -8,7 +8,7 @@ import java.io.DataOutputStream;
 public class DicClient implements DicConstants {
     public String username;
     private String password;
-    private boolean online;
+    public boolean online;
 
     public DicClient(String usernameData, String passwordData) throws IOException {
         username = usernameData;
@@ -51,5 +51,36 @@ public class DicClient implements DicConstants {
         toServer.writeInt(username.length());
         toServer.writeChars(username);
         online = false;
+    }
+
+    public int[] getLikeNum(DataOutputStream toServer, DataInputStream fromServer, String word) throws  IOException {
+        toServer.writeInt(GETRANK);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
+        int likeNum[] = new int[NUMOFDICS];
+        for (int i = 0; i < likeNum.length; i++)
+            likeNum[i] = fromServer.readInt();
+        return likeNum;
+    }
+
+    public void likeBaidu(DataOutputStream toServer, String word) throws IOException {
+        toServer.writeInt(LIKE);
+        toServer.writeInt(BAIDU);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
+    }
+
+    public void likeYoudao(DataOutputStream toServer, String word) throws IOException {
+        toServer.writeInt(LIKE);
+        toServer.writeInt(YOUDAO);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
+    }
+
+    public void likeBing(DataOutputStream toServer, String word) throws IOException {
+        toServer.writeInt(LIKE);
+        toServer.writeInt(BING);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
     }
 }
