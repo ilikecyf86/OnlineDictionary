@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
 
 public class LoginFrame extends JFrame {
@@ -30,13 +31,15 @@ public class LoginFrame extends JFrame {
     public DataInputStream fromServer;
 
     public LoginFrame() throws IOException {
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                super.windowClosing(e);
-                setVisible(false);
-            }
-        });
+        try {
+            socket = new Socket("172.26.88.90", 8000);
+            toServer = new DataOutputStream(socket.getOutputStream());
+            fromServer = new DataInputStream(socket.getInputStream());
+            System.out.print("Connected.");
+        } catch (ConnectException e1) {
+            System.out.println("无法连接到服务器。");
+            setVisible(false);
+        }
 
         panel.setLayout(new GridLayout(3, 1));
         panel.setBorder(BorderFactory.createEtchedBorder());
@@ -72,11 +75,6 @@ public class LoginFrame extends JFrame {
             else {
                 try {
                     client = new DicClient(username, password);
-                    /* 客户端连接服务器 */
-                    socket = new Socket("172.26.88.169", 8000);
-                    toServer = new DataOutputStream(socket.getOutputStream());
-                    fromServer = new DataInputStream(socket.getInputStream());
-                    System.out.print("Connected.");
                     /* 检测用户名密码是否存在且匹配 */
                     boolean loginFlag = client.login(toServer, fromServer);
                     if (loginFlag) {
@@ -101,10 +99,6 @@ public class LoginFrame extends JFrame {
             else {
                 try {
                     client = new DicClient(username, password);
-                    /* 客户端连接服务器 */
-                    socket = new Socket("172.26.88.169", 8000);
-                    toServer = new DataOutputStream(socket.getOutputStream());
-                    fromServer = new DataInputStream(socket.getInputStream());
                     boolean flagUsername = true;
                     /* 检测用户名是否符合规范 */
                     boolean checkUsername = judgeUsername(username);

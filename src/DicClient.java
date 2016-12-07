@@ -52,4 +52,35 @@ public class DicClient implements DicConstants {
         toServer.writeChars(username);
         online = false;
     }
+
+    public int[] getLikeNum(DataOutputStream toServer, DataInputStream fromServer, String word) throws  IOException {
+        toServer.writeInt(GETRANK);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
+        int likeNum[] = new int[NUMOFDICS];
+        for (int i = 0; i < likeNum.length; i++)
+            likeNum[i] = fromServer.readInt();
+        return likeNum;
+    }
+
+    public void likeBaidu(DataOutputStream toServer, String word) throws IOException {
+        toServer.writeInt(LIKE);
+        toServer.writeInt(BAIDU);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
+    }
+
+    public void likeYoudao(DataOutputStream toServer, String word) throws IOException {
+        toServer.writeInt(LIKE);
+        toServer.writeInt(YOUDAO);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
+    }
+
+    public void likeBing(DataOutputStream toServer, String word) throws IOException {
+        toServer.writeInt(LIKE);
+        toServer.writeInt(BING);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
+    }
 }
