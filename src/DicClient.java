@@ -4,13 +4,11 @@
 import java.io.IOException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.net.Socket;
-import java.util.ArrayList;
 
 public class DicClient implements DicConstants {
     public String username;
     private String password;
-    private boolean online;
+    public boolean online;
 
     public DicClient(String usernameData, String passwordData) throws IOException {
         username = usernameData;
@@ -55,60 +53,34 @@ public class DicClient implements DicConstants {
         online = false;
     }
 
-    public static void main(String[] args){
-        try {
-            Socket socket = new Socket("localhost", 8000);
-            DataOutputStream toServer = new DataOutputStream(socket.getOutputStream());
-            DataInputStream fromServer = new DataInputStream(socket.getInputStream());
-            String username = "user2";
-            String password = "password2";
-            toServer.writeInt(LOGIN);
-            toServer.writeInt(username.length());
-            toServer.writeInt(password.length());
-            toServer.writeChars(username);
-            toServer.writeChars(password);
-            boolean success = fromServer.readBoolean();
+    public int[] getLikeNum(DataOutputStream toServer, DataInputStream fromServer, String word) throws  IOException {
+        toServer.writeInt(GETRANK);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
+        int likeNum[] = new int[NUMOFDICS];
+        for (int i = 0; i < likeNum.length; i++)
+            likeNum[i] = fromServer.readInt();
+        return likeNum;
+    }
 
-//get online users example
-            System.out.println("get online users");
-            toServer.writeInt(ONLINEUSERS);
-            ArrayList <String> onlineUsers = new ArrayList<String>();
-            int num = fromServer.readInt();
-            for(int i = 0; i < num; i++){
-                int len = fromServer.readInt();
-                //System.out.println(len);
-                char[] name = new char[len];
-                for(int j = 0; j < len; j++){
-                    name[j] = fromServer.readChar();
-                }
-                String strName = new String(name);
-                onlineUsers.add(strName);
-            }
-            for(int i = 0; i < num; i++){
-                System.out.println(onlineUsers.get(i));
-            }
+    public void likeBaidu(DataOutputStream toServer, String word) throws IOException {
+        toServer.writeInt(LIKE);
+        toServer.writeInt(BAIDU);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
+    }
 
-//get offline users example
-            System.out.println("get offline users");
-            toServer.writeInt(OFFLINEUSERS);
-            ArrayList <String> offlineUsers = new ArrayList<String>();
-            num = fromServer.readInt();
-            for(int i = 0; i < num; i++){
-                int len = fromServer.readInt();
-                //System.out.println(len);
-                char[] name = new char[len];
-                for(int j = 0; j < len; j++){
-                    name[j] = fromServer.readChar();
-                }
-                String strName = new String(name);
-                offlineUsers.add(strName);
-            }
-            for(int i = 0; i < num; i++){
-                System.out.println(offlineUsers.get(i));
-            }
+    public void likeYoudao(DataOutputStream toServer, String word) throws IOException {
+        toServer.writeInt(LIKE);
+        toServer.writeInt(YOUDAO);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
+    }
 
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+    public void likeBing(DataOutputStream toServer, String word) throws IOException {
+        toServer.writeInt(LIKE);
+        toServer.writeInt(BING);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
     }
 }
