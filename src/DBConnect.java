@@ -1,9 +1,11 @@
 import javax.swing.*;
+import java.lang.reflect.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 /**
  * Created by cyf on 2016/11/21.
@@ -103,34 +105,20 @@ public class DBConnect {
         return false;
     }
 
-    public static void main(String[] args) throws Exception {
-        if(usernameExists("user1") == true)
-            System.out.println("user1 exists");
-        else
-            System.out.println("user1 doesn't exist");
-        System.out.println();
-
-        if(login("user1", "password1") == true)
-            System.out.println("user1 login success");
-        else
-            System.out.println("user1 login fail");
-        System.out.println();
-
-        if(register("user1", "password1") == true)
-            System.out.println("user1 register success");
-        else
-            System.out.println("user1 register fail");
-        System.out.println();
-
-        if(login("user1", "password1") == true)
-            System.out.println("user1 login success");
-        else
-            System.out.println("user1 login fail");
-        System.out.println();
-
-        if(login("user2", "password2") == true)
-            System.out.println("user2 login success");
-        else
-            System.out.println("user2 login fail");
+    public static ArrayList <String> getAllUsers() {
+        connectDB();
+        ResultSet rs;
+        ArrayList<String> users = new ArrayList<String>();
+        try {
+            Statement statement = connection.createStatement();
+            rs = statement.executeQuery("SELECT username FROM account");
+            while (rs.next()) {
+                String tempUsername = rs.getString(1);
+                users.add(tempUsername);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
     }
 }

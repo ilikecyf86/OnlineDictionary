@@ -114,7 +114,7 @@ public class DBConnect_likeNum {
         int dicNum = dicName.length;
         int[] likes = new int[dicNum];
         for(int i = 0; i < dicNum; i++)
-            likes[i] = -1;
+            likes[i] = 0;
         connectDB();
         ResultSet rs;
         try {

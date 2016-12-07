@@ -13,5 +13,6 @@ public interface DicConstants{
     public static int BING = 7;
     public static int GETRANK = 8;
     public static int LOGOUT = 9;
-
+    public static int ONLINEUSERS = 10;
+    public static int OFFLINEUSERS = 11;
 }

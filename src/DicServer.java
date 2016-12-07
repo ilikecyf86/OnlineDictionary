@@ -123,11 +123,11 @@ public class DicServer extends JFrame implements DicConstants{
                                     break;
                                 case YOUDAO:
                                     DBConnect_likeNum.likeYoudao(word);
-                                    jta.append("Client No." + num + " liked: youdao\n");
+                                    jta.append("Client No." + num + " liked: youdao for word: " + word + "\n");
                                     break;
                                 case BING:
                                     DBConnect_likeNum.likeBing(word);
-                                    jta.append("Client No." + num + " liked: bing\n");
+                                    jta.append("Client No." + num + " liked: bing for word: " + word + "\n");
                                     break;
                                 default:
                                     break;
@@ -156,8 +156,34 @@ public class DicServer extends JFrame implements DicConstants{
                             jta.append("Client No." + num + " logout username:" + usernameLogout + "\n");
                             onlineUsers.remove(usernameLogout);
                             break;
+                        case ONLINEUSERS:
+                            jta.append("Client No." + num + " get all online usernames\n");
+                            int onlineNum = onlineUsers.size();
+                            outputToClient.writeInt(onlineNum);
+                            Iterator<String> iterator1 = onlineUsers.iterator();
+                            while (iterator1.hasNext()) {
+                                String tempName = iterator1.next();
+                                outputToClient.writeInt(tempName.length());
+                                outputToClient.writeChars(tempName);
+                            }
+                            break;
+                        case OFFLINEUSERS:
+                            jta.append("Client No." + num + " get all offline usernames\n");
+                            ArrayList <String> allUsers = DBConnect.getAllUsers();
+                            allUsers.removeAll(onlineUsers);
+                            int offlineNum = allUsers.size();
+                            outputToClient.writeInt(offlineNum);
+                            for(int i = 0; i < offlineNum; i++) {
+                                String tempName = allUsers.get(i);
+                                outputToClient.writeInt(tempName.length());
+                                outputToClient.writeChars(tempName);
+                            }
+                            break;
                     }
                 }
+            }
+            catch(SocketException ex){
+                //socket.close();
             }
             catch (Exception e){
                 System.err.println(e);
