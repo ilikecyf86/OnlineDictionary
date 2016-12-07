@@ -179,6 +179,7 @@ public class DicServer extends JFrame implements DicConstants{
                                 outputToClient.writeChars(tempName);
                             }
                             break;
+                        
                     }
                 }
             }
