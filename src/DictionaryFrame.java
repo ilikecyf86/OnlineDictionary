@@ -46,6 +46,7 @@ public class DictionaryFrame extends JFrame {
     private String[] dicSortAsLike = { "空", "空", "空", "空" };
 
     private LoginFrame loginFrame = null;
+    private ViewFrame viewFrame = null;
     public DicClient client;
 
     public DictionaryFrame() {
@@ -377,8 +378,8 @@ public class DictionaryFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "请先登陆。", "FAILED", JOptionPane.INFORMATION_MESSAGE);
             else {
                 try {
-                    Vector <String> onlineUsers = client.viewOnlineUsers(loginFrame.toServer, loginFrame.fromServer);
-                    Vector <String> offlineUsers = client.viewOfflineUsers(loginFrame.toServer, loginFrame.fromServer);
+                    Vector onlineUsers = client.viewOnlineUsers(loginFrame.toServer, loginFrame.fromServer);
+                    Vector offlineUsers = client.viewOfflineUsers(loginFrame.toServer, loginFrame.fromServer);
                     /*
                     for (int i = 0; i < onlineUsers.size(); i++)
                         System.out.print(onlineUsers.elementAt(i) + " ");
@@ -387,7 +388,9 @@ public class DictionaryFrame extends JFrame {
                         System.out.print(offlineUsers.elementAt(i) + " ");
                     System.out.println();
                     */
-                    ;
+                    viewFrame = new ViewFrame(onlineUsers, offlineUsers);
+                    viewFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    viewFrame.setVisible(true);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
