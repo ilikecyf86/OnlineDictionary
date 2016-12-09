@@ -4,8 +4,8 @@
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,33 +13,21 @@ import java.net.ConnectException;
 import java.net.Socket;
 
 public class LoginFrame extends JFrame {
-    public static void main(String[] args) throws IOException {
-        LoginFrame lf = new LoginFrame();
-        lf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        lf.setVisible(true);
-    }
-
     private JPanel panel = new JPanel();
     private JButton login = new JButton("登陆");
     private JButton register = new JButton("注册");
     private JTextField usernameText = new JTextField(18);
     private JPasswordField passwordText = new JPasswordField(18);
 
-    public DicClient client;
     public Socket socket;
     public DataOutputStream toServer;
     public DataInputStream fromServer;
 
-    public LoginFrame() throws IOException {
-        try {
-            socket = new Socket("172.26.88.90", 8000);
-            toServer = new DataOutputStream(socket.getOutputStream());
-            fromServer = new DataInputStream(socket.getInputStream());
-            System.out.print("Connected.");
-        } catch (ConnectException e1) {
-            System.out.println("无法连接到服务器。");
-            setVisible(false);
-        }
+    public LoginFrame(final DictionaryFrame df) throws IOException {
+        socket = new Socket("172.26.117.207", 8000);
+        toServer = new DataOutputStream(socket.getOutputStream());
+        fromServer = new DataInputStream(socket.getInputStream());
+        System.out.println("成功连接到服务器。");
 
         panel.setLayout(new GridLayout(3, 1));
         panel.setBorder(BorderFactory.createEtchedBorder());
@@ -74,11 +62,13 @@ public class LoginFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "请输入密码！", "WARNING", JOptionPane.WARNING_MESSAGE);
             else {
                 try {
-                    client = new DicClient(username, password);
+                    df.client.setData(username, password);
                     /* 检测用户名密码是否存在且匹配 */
-                    boolean loginFlag = client.login(toServer, fromServer);
+                    boolean loginFlag = df.client.login(toServer, fromServer);
                     if (loginFlag) {
                         /* 登陆成功 */
+                        System.out.println("登陆成功。");
+                        df.loginSucceed();
                         setVisible(false);
                     } else
                         JOptionPane.showMessageDialog(this, "用户名或密码错误！", "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -98,7 +88,7 @@ public class LoginFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "请输入密码！", "WARNING", JOptionPane.WARNING_MESSAGE);
             else {
                 try {
-                    client = new DicClient(username, password);
+                    df.client.setData(username, password);
                     boolean flagUsername = true;
                     /* 检测用户名是否符合规范 */
                     boolean checkUsername = judgeUsername(username);
@@ -107,7 +97,7 @@ public class LoginFrame extends JFrame {
                         JOptionPane.showMessageDialog(this, "用户名不符合规范！", "WARNING", JOptionPane.WARNING_MESSAGE);
                     }
                     /* 检测用户名是否存在 */
-                    else if (!client.nameCheck(toServer, fromServer)) {
+                    else if (!df.client.nameCheck(toServer, fromServer)) {
                         flagUsername = false;
                         JOptionPane.showMessageDialog(this, "用户名已被注册！", "WARNING", JOptionPane.WARNING_MESSAGE);
                     }
@@ -117,7 +107,7 @@ public class LoginFrame extends JFrame {
                         if (!checkPassword)
                             JOptionPane.showMessageDialog(this, "密码不符合规范！", "WARNING", JOptionPane.WARNING_MESSAGE);
                         else {
-                            if (!client.register(toServer, fromServer))
+                            if (!df.client.register(toServer, fromServer))
                                 JOptionPane.showMessageDialog(this, "注册失败！", "ERROR", JOptionPane.ERROR_MESSAGE);
                             else
                                 JOptionPane.showMessageDialog(this, "注册成功！", "COMPLETE", JOptionPane.INFORMATION_MESSAGE);

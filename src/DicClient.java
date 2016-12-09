@@ -4,13 +4,23 @@
 import java.io.IOException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.util.Vector;
 
 public class DicClient implements DicConstants {
     public String username;
     private String password;
     public boolean online;
 
-    public DicClient(String usernameData, String passwordData) throws IOException {
+    public DicClient() {
+        online = false;
+    }
+
+    public void setData(String user, String pass) {
+        username = user;
+        password = pass;
+    }
+
+    public DicClient(String usernameData, String passwordData) {
         username = usernameData;
         password = passwordData;
         online = false;
@@ -82,5 +92,33 @@ public class DicClient implements DicConstants {
         toServer.writeInt(BING);
         toServer.writeInt(word.length());
         toServer.writeChars(word);
+    }
+
+    public Vector <String> viewOnlineUsers(DataOutputStream toServer, DataInputStream fromServer) throws IOException {
+        toServer.writeInt(ONLINEUSERS);
+        int onlineUserNum = fromServer.readInt();
+        Vector <String> onlineUsers = new Vector<>();
+        for (int i = 0; i < onlineUserNum; i++) {
+            String currentUser = "";
+            int len = fromServer.readInt();
+            for (int j = 0; j < len; j++)
+                currentUser += fromServer.readChar();
+            onlineUsers.add(currentUser);
+        }
+        return onlineUsers;
+    }
+
+    public Vector <String> viewOfflineUsers(DataOutputStream toServer, DataInputStream fromServer) throws IOException {
+        toServer.writeInt(OFFLINEUSERS);
+        int offlineUserNum = fromServer.readInt();
+        Vector <String> offlineUsers = new Vector<>();
+        for (int i = 0; i < offlineUserNum; i++) {
+            String currentUser = "";
+            int len = fromServer.readInt();
+            for (int j = 0; j < len; j++)
+                currentUser += fromServer.readChar();
+            offlineUsers.add(currentUser);
+        }
+        return offlineUsers;
     }
 }

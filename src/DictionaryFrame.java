@@ -10,6 +10,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
+import java.util.Vector;
 
 public class DictionaryFrame extends JFrame {
     public static void main(String[] args) {
@@ -20,7 +22,7 @@ public class DictionaryFrame extends JFrame {
 
     private JPanel panel = new JPanel();
     private JLabel title = new JLabel("欢迎使用英汉在线词典", JLabel.CENTER);
-    private JButton viewAll = new JButton("查看用户");
+    private JButton viewUsers = new JButton("查看用户");
     private JLabel greeting = new JLabel("你好，请", JLabel.CENTER);
     private JButton loginButton = new JButton("登陆");
     private JTextField input = new JTextField(25);
@@ -44,7 +46,7 @@ public class DictionaryFrame extends JFrame {
     private String[] dicSortAsLike = { "空", "空", "空", "空" };
 
     private LoginFrame loginFrame = null;
-    private boolean ifLogin;
+    public DicClient client;
 
     public DictionaryFrame() {
         panel.setLayout(new GridLayout(4, 1));
@@ -57,7 +59,7 @@ public class DictionaryFrame extends JFrame {
 
         JPanel panelLineTwo = new JPanel(new GridLayout(1, 2));
         JPanel panelView = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        panelView.add(viewAll);
+        panelView.add(viewUsers);
         panelLineTwo.add(panelView);
         JPanel panelLogin = new JPanel();
         panelLogin.add(greeting);
@@ -107,13 +109,13 @@ public class DictionaryFrame extends JFrame {
         like3.setVisible(false);
         panel.add(panelResult3);
 
-        ifLogin = true;
-
         add(panel);
         setTitle("英汉大词典");
         setSize(400,600);
         setLocation(200,200);
         setResizable(false);
+
+        client = new DicClient();
 
         checkAll.addActionListener(e -> {
             if (checkAll.isSelected()) {
@@ -163,9 +165,9 @@ public class DictionaryFrame extends JFrame {
                 like2.setBackground(Color.WHITE);
                 like3.setBackground(Color.WHITE);
                 /* 请求服务器返回按赞数排序的词典集合 */
-                if (ifLogin) {
+                if (client.online) {
                     try {
-                        int likeNum[] = loginFrame.client.getLikeNum(loginFrame.toServer, loginFrame.fromServer, word);
+                        int likeNum[] = client.getLikeNum(loginFrame.toServer, loginFrame.fromServer, word);
                         DicLikeNum dic[] = { new DicLikeNum("百度", likeNum[0]), new DicLikeNum("有道", likeNum[1]), new DicLikeNum("必应", likeNum[2]) };
                         for (int i = 0; i < 3; i++) {
                             int max = i;
@@ -295,26 +297,38 @@ public class DictionaryFrame extends JFrame {
 
         /* 登陆部分，如果未登录就登录，如果登录了就退出 */
         loginButton.addActionListener(e -> {
-            try {
-                loginFrame = new LoginFrame();
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            if (!client.online) {
+                try {
+                    loginFrame = new LoginFrame(this);
+                    loginFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    loginFrame.setVisible(true);
+                } catch (IOException e1) {
+                    //e1.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "无法连接至服务器。目前无法登陆或注册。", "FAILED", JOptionPane.WARNING_MESSAGE);
+                }
             }
-            loginFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            loginFrame.setVisible(true);
+            else {
+                try {
+                    client.logout(loginFrame.toServer);
+                    System.out.println("退出成功。");
+                    logoutSucceed();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
         });
 
         /* 点赞部分 */
         like1.addActionListener(e -> {
-            if (!ifLogin)
+            if (!client.online)
                 JOptionPane.showMessageDialog(this, "请先登陆。", "FAILED", JOptionPane.INFORMATION_MESSAGE);
             else {
                 if (like1.getBackground() == Color.WHITE) {
                     like1.setBackground(Color.PINK);
                     switch (dicSortAsLike[0]) {
-                        case "百度": try { loginFrame.client.likeBaidu(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
-                        case "有道": try { loginFrame.client.likeYoudao(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
-                        case "必应": try { loginFrame.client.likeBing(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
+                        case "百度": try { client.likeBaidu(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
+                        case "有道": try { client.likeYoudao(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
+                        case "必应": try { client.likeBing(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
                         default: break;
                     }
                 }
@@ -323,15 +337,15 @@ public class DictionaryFrame extends JFrame {
             }
         });
         like2.addActionListener(e -> {
-            if (!ifLogin)
+            if (!client.online)
                 JOptionPane.showMessageDialog(this, "请先登陆。", "FAILED", JOptionPane.INFORMATION_MESSAGE);
             else {
                 if (like2.getBackground() == Color.WHITE) {
                     like2.setBackground(Color.PINK);
                     switch (dicSortAsLike[1]) {
-                        case "百度": try { loginFrame.client.likeBaidu(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
-                        case "有道": try { loginFrame.client.likeYoudao(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
-                        case "必应": try { loginFrame.client.likeBing(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
+                        case "百度": try { client.likeBaidu(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
+                        case "有道": try { client.likeYoudao(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
+                        case "必应": try { client.likeBing(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
                         default: break;
                     }
                 }
@@ -340,15 +354,15 @@ public class DictionaryFrame extends JFrame {
             }
         });
         like3.addActionListener(e -> {
-            if (!ifLogin)
+            if (!client.online)
                 JOptionPane.showMessageDialog(this, "请先登陆。", "FAILED", JOptionPane.INFORMATION_MESSAGE);
             else {
                 if (like3.getBackground() == Color.WHITE) {
                     like3.setBackground(Color.PINK);
                     switch (dicSortAsLike[2]) {
-                        case "百度": try { loginFrame.client.likeBaidu(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
-                        case "有道": try { loginFrame.client.likeYoudao(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
-                        case "必应": try { loginFrame.client.likeBing(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
+                        case "百度": try { client.likeBaidu(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
+                        case "有道": try { client.likeYoudao(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
+                        case "必应": try { client.likeBing(loginFrame.toServer, word); } catch (IOException e1) { e1.printStackTrace(); } break;
                         default: break;
                     }
                 }
@@ -358,11 +372,25 @@ public class DictionaryFrame extends JFrame {
         });
 
         /* 查看用户 */
-        viewAll.addActionListener(e -> {
-            if (!ifLogin)
+        viewUsers.addActionListener(e -> {
+            if (!client.online)
                 JOptionPane.showMessageDialog(this, "请先登陆。", "FAILED", JOptionPane.INFORMATION_MESSAGE);
             else {
-                ;
+                try {
+                    Vector <String> onlineUsers = client.viewOnlineUsers(loginFrame.toServer, loginFrame.fromServer);
+                    Vector <String> offlineUsers = client.viewOfflineUsers(loginFrame.toServer, loginFrame.fromServer);
+                    /*
+                    for (int i = 0; i < onlineUsers.size(); i++)
+                        System.out.print(onlineUsers.elementAt(i) + " ");
+                    System.out.println();
+                    for (int i = 0; i < offlineUsers.size(); i++)
+                        System.out.print(offlineUsers.elementAt(i) + " ");
+                    System.out.println();
+                    */
+                    ;
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
         });
 
@@ -371,9 +399,9 @@ public class DictionaryFrame extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                if (ifLogin) {
+                if (client.online) {
                     try {
-                        loginFrame.client.logout(loginFrame.toServer);
+                        client.logout(loginFrame.toServer);
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
@@ -392,6 +420,16 @@ public class DictionaryFrame extends JFrame {
                 return false;
         }
         return true;
+    }
+
+    public void loginSucceed() {
+        greeting.setText("你好，" + client.username);
+        loginButton.setText("退出");
+    }
+
+    public void logoutSucceed() {
+        greeting.setText("你好。请");
+        loginButton.setText("登陆");
     }
 }
 
