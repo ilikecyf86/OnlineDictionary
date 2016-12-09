@@ -24,13 +24,13 @@ public class OnlineSearch {
                 result += meaning.get(i).text();
                 result += "\n";
             }
-            /*Elements meaningAndOther = page.select(".in-base li p");
+            Elements meaningAndOther = page.select(".in-base li p");
             if(meaningAndOther.size()!= 0)
                 result += "\n";
             for(int i = meaning.size(); i < meaningAndOther.size(); i++){
                 result += meaningAndOther.get(i).text();
                 result += "\n";
-            }*/
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,10 +58,20 @@ public class OnlineSearch {
         String result = keyword + "\n";
         try {
             Document page = Jsoup.connect(url).get();
-            Elements meaning = page.select(".qdef ul li");
-            for(int i = 0; i < meaning.size(); i++){
-                result += meaning.get(i).text();
+            Elements pos = page.select(".qdef ul li .pos");
+            Elements def = page.select(".qdef ul li .def");
+            Elements hd_if = page.select(".qdef .hd_if");
+            for(int i = 0; i < pos.size(); i++){
+                result += '[';
+                result += pos.get(i).text();
+                result += "] ";
+                result += def.get(i).text();
                 result += "\n";
+            }
+            if(hd_if.size() != 0)
+                result += '\n';
+            for(int i = 0; i < hd_if.size(); i++){
+                result += hd_if.get(i).text();
             }
         } catch (IOException e) {
             e.printStackTrace();
