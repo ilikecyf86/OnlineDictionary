@@ -10,22 +10,21 @@ import java.io.IOException;
 public class OnlineSearch {
     public static void main(String args[]){
         //baidu youdao bing
-        String s = searchYoudao("part");
+        String s = searchBaidu("play");
         System.out.println(s);
     }
 
     public static String searchBaidu(String keyword) {
-        String url = "http://dict.baidu.com/s?wd=" + keyword + "&device=pc&from=home&q=" + keyword;
+        String url = "http://www.iciba.com/" + keyword;
         String result = keyword + "\n";
         try {
             Document page = Jsoup.connect(url).get();
-            Elements meaning = page.select("#simple_means-wrapper div div p");
+            Elements meaning = page.select(".in-base ul li");
             for(int i = 0; i < meaning.size(); i++){
                 result += meaning.get(i).text();
                 result += "\n";
             }
-
-            Elements meaningAndOther = page.select("#simple_means-wrapper div p span");
+            Elements meaningAndOther = page.select(".in-base li p");
             if(meaningAndOther.size()!= 0)
                 result += "\n";
             for(int i = meaning.size(); i < meaningAndOther.size(); i++){
@@ -69,5 +68,4 @@ public class OnlineSearch {
         }
         return result;
     }
-
 }
