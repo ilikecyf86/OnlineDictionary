@@ -24,13 +24,13 @@ public class OnlineSearch {
                 result += meaning.get(i).text();
                 result += "\n";
             }
-            Elements meaningAndOther = page.select(".in-base li p");
+            /*Elements meaningAndOther = page.select(".in-base li p");
             if(meaningAndOther.size()!= 0)
                 result += "\n";
             for(int i = meaning.size(); i < meaningAndOther.size(); i++){
                 result += meaningAndOther.get(i).text();
                 result += "\n";
-            }
+            }*/
         } catch (IOException e) {
             e.printStackTrace();
         }
