@@ -15,4 +15,7 @@ public interface DicConstants{
     public static int LOGOUT = 9;
     public static int ONLINEUSERS = 10;
     public static int OFFLINEUSERS = 11;
+    public static int SENDWORD = 12;
+    public static int GETCARDS = 13;
+    public static int READCARDS = 14;
 }
