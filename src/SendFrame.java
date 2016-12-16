@@ -18,6 +18,8 @@ public class SendFrame extends JFrame {
     public SendFrame(final DictionaryFrame dicFrame) {
         panel.setLayout(new FlowLayout(FlowLayout.CENTER));
         panel.setBorder(BorderFactory.createEtchedBorder());
+
+        userList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         usersJSP.setPreferredSize(new Dimension(180, 660));
 
         try {
@@ -54,6 +56,8 @@ public class SendFrame extends JFrame {
                 System.out.print(nameList[i] + " ");
             }
             System.out.println();
+
+            /* 向服务器发出发送单词卡请求 */
         });
     }
 }
