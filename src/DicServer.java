@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
+import java.sql.ResultSet;
 import java.util.*;
 
 /**
@@ -94,6 +95,9 @@ public class DicServer extends JFrame implements DicConstants{
                             String usernameRegister = new String(usernameRegisterC);
                             String passwordRegister = new String(passwordRegisterC);
                             boolean successRegister = DBConnect.register(usernameRegister, passwordRegister);
+                            if(successRegister){
+                                DBConnect_wordCard.addTable(usernameRegister);
+                            }
                             outputToClient.writeBoolean(successRegister);
                             jta.append("Client No." + num + " register using username: " + usernameRegister + " (" + successRegister +  ")\n");
                             break;
@@ -179,7 +183,99 @@ public class DicServer extends JFrame implements DicConstants{
                                 outputToClient.writeChars(tempName);
                             }
                             break;
-                        
+                        case SENDWORD:
+                            int sendWordReceiverLen = inputFromClient.readInt();
+                            char[] sendWordReceiverC = new char[sendWordReceiverLen];
+                            for(int i = 0; i < sendWordReceiverLen; i++){
+                                sendWordReceiverC[i] = inputFromClient.readChar();
+                            }
+                            String sendWordReceiver = new String(sendWordReceiverC);
+
+                            int sendWordLen = inputFromClient.readInt();
+                            char[] sendWordC = new char[sendWordLen];
+                            for(int i = 0; i < sendWordLen; i++){
+                                sendWordC[i] = inputFromClient.readChar();
+                            }
+                            String sendWord = new String(sendWordC);
+
+                            int sendWordSenderLen = inputFromClient.readInt();
+                            char[] sendWordSenderC = new char[sendWordSenderLen];
+                            for(int i = 0; i < sendWordSenderLen; i++){
+                                sendWordSenderC[i] = inputFromClient.readChar();
+                            }
+                            String sendWordSender = new String(sendWordSenderC);
+                            jta.append("Client No." + num + " send word: " + sendWord + ", from: " + sendWordSender + ", to:" + sendWordReceiver + "\n");
+                            DBConnect_wordCard.sendWord(sendWord,sendWordSender,sendWordReceiver);
+                            break;
+                        case GETCARDS:
+                            int getCardsLen = inputFromClient.readInt();
+                            char[] getCardsUsernameC = new char[getCardsLen];
+                            for(int i = 0; i < getCardsLen; i++){
+                                getCardsUsernameC[i] = inputFromClient.readChar();
+                            }
+                            String getCardsUsername = new String(getCardsUsernameC);
+                            jta.append("Client No." + num + " get word cards of user: " + getCardsUsername + "\n");
+
+                            ArrayList []newCardsArrayLists = DBConnect_wordCard.getNewCards(getCardsUsername);
+                            ArrayList <String> newCards = newCardsArrayLists[0];
+                            ArrayList <String> newCardsSenders = newCardsArrayLists[1];
+                            ArrayList <Integer> newCardsDicNo = newCardsArrayLists[2];
+                            int newCardsSize = newCardsArrayLists[0].size();
+                            outputToClient.writeInt(newCardsSize);
+                            for(int i = 0; i < newCardsSize; i++){
+                                outputToClient.writeInt(newCards.get(i).length());
+                                outputToClient.writeChars(newCards.get(i));
+                            }
+                            for(int i = 0; i < newCardsSize; i++){
+                                outputToClient.writeInt(newCardsSenders.get(i).length());
+                                outputToClient.writeChars(newCardsSenders.get(i));
+                            }
+                            for(int i = 0; i < newCardsSize; i++){
+                                outputToClient.writeInt(newCardsDicNo.get(i));
+                            }
+
+                            ArrayList []oldCardsArrayLists = DBConnect_wordCard.getOldCards(getCardsUsername);
+                            ArrayList <String> oldCards = oldCardsArrayLists[0];
+                            ArrayList <String> oldCardsSenders = oldCardsArrayLists[1];
+                            ArrayList <Integer> oldCardsDicNo = oldCardsArrayLists[2];
+                            int oldCardsSize = oldCardsArrayLists[0].size();
+                            outputToClient.writeInt(oldCardsSize);
+                            for(int i = 0; i < oldCardsSize; i++){
+                                outputToClient.writeInt(oldCards.get(i).length());
+                                outputToClient.writeChars(oldCards.get(i));
+                            }
+                            for(int i = 0; i < oldCardsSize; i++){
+                                outputToClient.writeInt(oldCardsSenders.get(i).length());
+                                outputToClient.writeChars(oldCardsSenders.get(i));
+                            }
+                            for(int i = 0; i < oldCardsSize; i++){
+                                outputToClient.writeInt(oldCardsDicNo.get(i));
+                            }
+                            break;
+                        case READCARDS:
+                            int readCardReceiverLen = inputFromClient.readInt();
+                            char[] readCardReceiverC = new char[readCardReceiverLen];
+                            for(int i = 0; i < readCardReceiverLen; i++){
+                                readCardReceiverC[i] = inputFromClient.readChar();
+                            }
+                            String readCardReceiver = new String(readCardReceiverC);
+
+                            int readCardLen = inputFromClient.readInt();
+                            char[] readCardC = new char[readCardLen];
+                            for(int i = 0; i < readCardLen; i++){
+                                readCardC[i] = inputFromClient.readChar();
+                            }
+                            String readCard = new String(readCardC);
+
+                            int readCardSenderLen = inputFromClient.readInt();
+                            char[] readCardSenderC = new char[readCardSenderLen];
+                            for(int i = 0; i < readCardSenderLen; i++){
+                                readCardSenderC[i] = inputFromClient.readChar();
+                            }
+                            String readCardSender = new String(readCardSenderC);
+
+                            jta.append("Client No." + num + " read word card: " + readCard + ", receiver:" + readCardReceiver + ", sender: " + readCardSender + "\n");
+                            DBConnect_wordCard.setReadFlag(readCardReceiver, readCard, readCardSender);
                     }
                 }
             }
