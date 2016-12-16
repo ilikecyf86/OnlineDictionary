@@ -8,12 +8,6 @@ import java.io.IOException;
  * Created by cyf on 2016/11/9.
  */
 public class OnlineSearch {
-    public static void main(String args[]){
-        //baidu youdao bing
-        String s = searchBaidu("play");
-        System.out.println(s);
-    }
-
     public static String searchBaidu(String keyword) {
         String url = "http://www.iciba.com/" + keyword;
         String result = keyword + "\n";

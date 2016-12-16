@@ -21,7 +21,7 @@ public class LoginFrame extends JFrame {
     public DataInputStream fromServer;
 
     public LoginFrame(final DictionaryFrame dicFrame) throws IOException {
-        socket = new Socket("172.26.117.207", 8000);
+        socket = new Socket("172.26.107.175", 8000);
         toServer = new DataOutputStream(socket.getOutputStream());
         fromServer = new DataInputStream(socket.getInputStream());
         System.out.println("成功连接到服务器。");
@@ -47,7 +47,7 @@ public class LoginFrame extends JFrame {
         add(panel);
         setTitle("登陆&注册");
         setSize(250, 200);
-        setLocation(275, 400);
+        setLocation(325, 300);
         setResizable(false);
 
         login.addActionListener(e -> {
