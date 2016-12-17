@@ -11,6 +11,7 @@ import java.util.*;
 
 
 public class DicServer extends JFrame implements DicConstants{
+    //建立一个TextArea，显示服务器当前进行的操作，方便DEBUG
     private  JTextArea jta = new JTextArea();
     private Set<String> onlineUsers = new TreeSet<String>();
     public static void main(String[] args){
@@ -225,13 +226,9 @@ public class DicServer extends JFrame implements DicConstants{
                             for(int i = 0; i < newCardsSize; i++){
                                 outputToClient.writeInt(newCards.get(i).length());
                                 outputToClient.writeChars(newCards.get(i));
-                            }
-                            for(int i = 0; i < newCardsSize; i++){
+                                outputToClient.writeInt(newCardsDicNo.get(i));
                                 outputToClient.writeInt(newCardsSenders.get(i).length());
                                 outputToClient.writeChars(newCardsSenders.get(i));
-                            }
-                            for(int i = 0; i < newCardsSize; i++){
-                                outputToClient.writeInt(newCardsDicNo.get(i));
                             }
 
                             ArrayList []oldCardsArrayLists = DBConnect_wordCard.getOldCards(getCardsUsername);
@@ -243,13 +240,9 @@ public class DicServer extends JFrame implements DicConstants{
                             for(int i = 0; i < oldCardsSize; i++){
                                 outputToClient.writeInt(oldCards.get(i).length());
                                 outputToClient.writeChars(oldCards.get(i));
-                            }
-                            for(int i = 0; i < oldCardsSize; i++){
+                                outputToClient.writeInt(oldCardsDicNo.get(i));
                                 outputToClient.writeInt(oldCardsSenders.get(i).length());
                                 outputToClient.writeChars(oldCardsSenders.get(i));
-                            }
-                            for(int i = 0; i < oldCardsSize; i++){
-                                outputToClient.writeInt(oldCardsDicNo.get(i));
                             }
                             break;
                         case READCARDS:

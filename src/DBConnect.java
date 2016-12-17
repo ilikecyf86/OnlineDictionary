@@ -10,10 +10,13 @@ import java.util.ArrayList;
 /**
  * Created by cyf on 2016/11/21.
  */
+
+//连接存储账户信息的数据库
 public class DBConnect {
 
     private static Connection connection;
 
+    //获取连接
     private static void connectDB(){
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -30,6 +33,7 @@ public class DBConnect {
         }
     }
 
+    //断开连接
     private static void disconnectDB() {
         try {
             connection.close();
@@ -38,6 +42,7 @@ public class DBConnect {
         }
     }
 
+    //用username和password登录，返回登录是否成功的bool值
     public static boolean login(String username, String password) {
         connectDB();
         ResultSet rs;
@@ -60,6 +65,7 @@ public class DBConnect {
         return false;
     }
 
+    //注册时使用，判断是否已存在用户名
     public static boolean usernameExists(String username){
         connectDB();
         ResultSet rs;
@@ -81,6 +87,7 @@ public class DBConnect {
         return false;
     }
 
+    //用username和password注册一个新账户，返回注册是否成功
     public static boolean register(String username, String password){
         connectDB();
         ResultSet rs;
@@ -105,6 +112,7 @@ public class DBConnect {
         return false;
     }
 
+    //返回所有用户的用户名
     public static ArrayList <String> getAllUsers() {
         connectDB();
         ResultSet rs;
@@ -119,6 +127,7 @@ public class DBConnect {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        disconnectDB();
         return users;
     }
 }
