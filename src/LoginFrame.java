@@ -21,7 +21,7 @@ public class LoginFrame extends JFrame {
     public DataInputStream fromServer;
 
     public LoginFrame(final DictionaryFrame dicFrame) throws IOException {
-        socket = new Socket("172.26.117.207", 8000);
+        socket = new Socket("172.26.38.90", 8000);
         toServer = new DataOutputStream(socket.getOutputStream());
         fromServer = new DataInputStream(socket.getInputStream());
         System.out.println("成功连接到服务器。");
@@ -47,7 +47,8 @@ public class LoginFrame extends JFrame {
         add(panel);
         setTitle("登陆&注册");
         setSize(250, 200);
-        setLocation(275, 400);
+        Rectangle rect = dicFrame.getBounds();
+        setLocation(rect.x + 75, rect.y + 200);
         setResizable(false);
 
         login.addActionListener(e -> {
@@ -60,10 +61,10 @@ public class LoginFrame extends JFrame {
             else {
                 try {
                     dicFrame.client.setData(username, password);
-                    /* 检测用户名密码是否存在且匹配 */
+                    /* todo:检测用户名密码是否存在且匹配 */
                     boolean loginFlag = dicFrame.client.login(toServer, fromServer);
                     if (loginFlag) {
-                        /* 登陆成功 */
+                        /* todo:登陆成功后的操作 */
                         System.out.println("登陆成功。");
                         dicFrame.loginSucceed();
                         setVisible(false);
@@ -87,19 +88,19 @@ public class LoginFrame extends JFrame {
                 try {
                     dicFrame.client.setData(username, password);
                     boolean flagUsername = true;
-                    /* 检测用户名是否符合规范 */
+                    /* todo:检测用户名是否符合规范 */
                     boolean checkUsername = judgeUsername(username);
                     if (!checkUsername) {
                         flagUsername = false;
                         JOptionPane.showMessageDialog(this, "用户名不符合规范！", "WARNING", JOptionPane.WARNING_MESSAGE);
                     }
-                    /* 检测用户名是否存在 */
+                    /* todo:检测用户名是否存在 */
                     else if (!dicFrame.client.nameCheck(toServer, fromServer)) {
                         flagUsername = false;
                         JOptionPane.showMessageDialog(this, "用户名已被注册！", "WARNING", JOptionPane.WARNING_MESSAGE);
                     }
                     if (flagUsername) {
-                        /* 检测密码是否符合规范 */
+                        /* todo:检测密码是否符合规范 */
                         boolean checkPassword = judgePassword(password);
                         if (!checkPassword)
                             JOptionPane.showMessageDialog(this, "密码不符合规范！", "WARNING", JOptionPane.WARNING_MESSAGE);

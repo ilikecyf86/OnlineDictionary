@@ -121,4 +121,76 @@ public class DicClient implements DicConstants {
         }
         return offlineUsers;
     }
+
+    public void sendWordCard(DataOutputStream toServer, String recipient, String word, String sender) throws IOException {
+        toServer.writeInt(SENDWORD);
+        toServer.writeInt(recipient.length());
+        toServer.writeChars(recipient);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
+        toServer.writeInt(sender.length());
+        toServer.writeChars(sender);
+    }
+
+    public Vector <String> getWordCard(DataOutputStream toServer, DataInputStream fromServer, String user) throws IOException {
+        toServer.writeInt(GETCARDS);
+        toServer.writeInt(user.length());
+        toServer.writeChars(user);
+        Vector <String> Cards = new Vector<>();
+        int unreadNum = fromServer.readInt();
+        for (int i = 0; i < unreadNum; i++) {
+            String cardData = "(未读) ";
+            int wordLen = fromServer.readInt();
+            for (int j = 0; j < wordLen; j++)
+                cardData += fromServer.readChar();
+            cardData += '.';
+            int dicNum = fromServer.readInt();
+            switch (dicNum) {
+                case 0: cardData += "Baidu"; break;
+                case 1: cardData += "Youdao"; break;
+                case 2: cardData += "Bing"; break;
+                default: System.out.println("获取单词卡信息错误！"); break;
+            }
+            cardData += ".from ";
+            int SenderLen = fromServer.readInt();
+            for (int j = 0; j < SenderLen; j++)
+                cardData += fromServer.readChar();
+            cardData += ".to ";
+            cardData += username;
+            Cards.add(cardData);
+        }
+        int readNum = fromServer.readInt();
+        for (int i = 0; i < readNum; i++) {
+            String cardData = "";
+            int wordLen = fromServer.readInt();
+            for (int j = 0; j < wordLen; j++)
+                cardData += fromServer.readChar();
+            cardData += '.';
+            int dicNum = fromServer.readInt();
+            switch (dicNum) {
+                case 0: cardData += "Baidu"; break;
+                case 1: cardData += "Youdao"; break;
+                case 2: cardData += "Bing"; break;
+                default: System.out.println("获取单词卡信息错误！"); break;
+            }
+            cardData += ".from ";
+            int SenderLen = fromServer.readInt();
+            for (int j = 0; j < SenderLen; j++)
+                cardData += fromServer.readChar();
+            cardData += ".to ";
+            cardData += username;
+            Cards.add(cardData);
+        }
+        return Cards;
+    }
+
+    public void readWordCard(DataOutputStream toServer, String recipient, String word, String sender) throws IOException {
+        toServer.writeInt(READCARDS);
+        toServer.writeInt(recipient.length());
+        toServer.writeChars(recipient);
+        toServer.writeInt(word.length());
+        toServer.writeChars(word);
+        toServer.writeInt(sender.length());
+        toServer.writeChars(sender);
+    }
 }
