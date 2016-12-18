@@ -69,7 +69,7 @@ public class LoginFrame extends JFrame {
                         dicFrame.loginSucceed();
                         setVisible(false);
                     } else
-                        JOptionPane.showMessageDialog(this, "用户名或密码错误！", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "登陆失败！", "ERROR", JOptionPane.ERROR_MESSAGE);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
