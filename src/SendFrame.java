@@ -29,7 +29,7 @@ public class SendFrame extends JFrame {
             e.printStackTrace();
         }
 
-        Vector users = new Vector<String>();
+        Vector <String> users = new Vector<>();
         for (int i = 0; i < onlineUsers.size(); i++)
             users.add(" [在线] " + onlineUsers.elementAt(i));
         for (int i = 0; i < offlineUsers.size(); i++)
@@ -43,7 +43,8 @@ public class SendFrame extends JFrame {
         add(panel);
         setTitle("选择");
         setSize(200, 750);
-        setLocation(645, 100);
+        Rectangle rect = dicFrame.getBounds();
+        setLocation(rect.x + 400, rect.y);
         setResizable(false);
 
         send.addActionListener(e -> {
@@ -51,13 +52,20 @@ public class SendFrame extends JFrame {
             int size = selected.length;
             System.out.print(size + ": ");
             String nameList[] = new String[size];
-            for (int i = 0; i < selected.length; i++) {
+            for (int i = 0; i < size; i++) {
                 nameList[i] = users.elementAt(selected[i]).toString().substring(6);
                 System.out.print(nameList[i] + " ");
             }
             System.out.println();
 
-            /* 向服务器发出发送单词卡请求 */
+            /* todo:向服务器发出发送单词卡请求 */
+            try {
+                for (int i = 0; i < size; i++)
+                    dicFrame.client.sendWordCard(dicFrame.loginFrame.toServer, nameList[i], dicFrame.word, dicFrame.client.username);
+                JOptionPane.showMessageDialog(this, "单词卡发送成功！", "COMPLETE", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         });
     }
 }

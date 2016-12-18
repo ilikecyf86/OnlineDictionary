@@ -24,13 +24,13 @@ public class ViewFrame extends JFrame {
             e.printStackTrace();
         }
 
-        Vector users = new Vector<String>();
+        Vector <String> users = new Vector<>();
         for (int i = 0; i < onlineUsers.size(); i++)
             users.add(" [在线] " + onlineUsers.elementAt(i));
         for (int i = 0; i < offlineUsers.size(); i++)
             users.add(" [离线] " + offlineUsers.elementAt(i));
         userList.setListData(users);
-        /*尝试分别修改在线用户和离线用户的颜色
+        /* todo:尝试分别修改在线用户和离线用户的颜色
         userList.setCellRenderer(new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -42,7 +42,8 @@ public class ViewFrame extends JFrame {
         add(panel);
         setTitle("用户");
         setSize(200, 750);
-        setLocation(645, 100);
+        Rectangle rect = dicFrame.getBounds();
+        setLocation(rect.x + 400, rect.y);
         setResizable(false);
     }
 }
