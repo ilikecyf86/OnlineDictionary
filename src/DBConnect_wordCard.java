@@ -6,9 +6,11 @@ import java.util.ArrayList;
 /**
  * Created by cyf on 2016/12/16.
  */
+//连接单词卡片数据库
 public class DBConnect_wordCard implements DicConstants{
     private static Connection connection;
 
+    //连接数据库
     private static void connectDB(){
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -25,6 +27,7 @@ public class DBConnect_wordCard implements DicConstants{
         }
     }
 
+    //断开数据库连接
     private static void disconnectDB() {
         try {
             connection.close();
@@ -33,6 +36,7 @@ public class DBConnect_wordCard implements DicConstants{
         }
     }
 
+    //为一个用户新添加一张表格，存放该用户的单词卡片，该函数在用户注册时被调用
     public static void addTable(String username){
         connectDB();
         try {
@@ -45,10 +49,12 @@ public class DBConnect_wordCard implements DicConstants{
         disconnectDB();
     }
 
+    //在数据库中添加一条记录，由sender发送的单词word，接受者为receiver
     public static void sendWord(String word, String sender, String receiver) {
         connectDB();
         try {
             Statement statement = connection.createStatement();
+            //以下几行用于获得该单词目前点赞数最多的词典，将该释义作为单词卡片中的内容
             int[] likeNum = new int[3];
             likeNum = DBConnect_likeNum.getLikes(word);
             int no = 0;
@@ -68,6 +74,7 @@ public class DBConnect_wordCard implements DicConstants{
         disconnectDB();
     }
 
+    //返回某个用户的未读单词卡，单词卡中有3个内容，单词、释义的词典号、发送者
     public static ArrayList[] getNewCards(String username){
         connectDB();
         ResultSet rs;
@@ -93,6 +100,7 @@ public class DBConnect_wordCard implements DicConstants{
         return arrayLists;
     }
 
+    //返回某个用户的已读单词卡，单词卡中有3个内容，单词、释义的词典号、发送者
     public static ArrayList[] getOldCards(String username){
         connectDB();
         ResultSet rs;
@@ -118,6 +126,7 @@ public class DBConnect_wordCard implements DicConstants{
         return arrayLists;
     }
 
+    //将某个用户的某张单词卡设为已读
     public static void setReadFlag(String receiver, String word, String sender){
         connectDB();
 

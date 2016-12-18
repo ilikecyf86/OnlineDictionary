@@ -7,9 +7,11 @@ import java.sql.Statement;
 /**
  * Created by cyf on 2016/11/21.
  */
+//连接存储点赞信息的数据库
 public class DBConnect_likeNum {
     private static Connection connection;
 
+    //连接数据库
     private static void connectDB(){
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -26,6 +28,7 @@ public class DBConnect_likeNum {
         }
     }
 
+    //断开连接数据库
     private static void disconnectDB() {
         try {
             connection.close();
@@ -34,6 +37,7 @@ public class DBConnect_likeNum {
         }
     }
 
+    //为某个单词的百度释义点赞
     public static void likeBaidu(String word){
         connectDB();
         ResultSet rs;
@@ -42,9 +46,11 @@ public class DBConnect_likeNum {
             //statement.executeUpdate("create table if not exists likes(dicName VARCHAR(16) not null, num INTEGER DEFAULT 0, PRIMARY KEY (dicName))");
             String dicName = "baidu";
             rs = statement.executeQuery("select " + dicName + " from likes where word = '"+ word +"'");
+            //若数据库中没有该单词，则添加一条该单词的记录
             if(rs.next() == false){
                 statement.executeUpdate("insert into likes(word, baidu, youdao, bing) values('" + word + "', 1, 0, 0)");
             }
+            //若有该单词，则百度的点赞数+1
             else {
                 int likeNum = -1;
                 likeNum = rs.getInt(dicName);
@@ -59,6 +65,7 @@ public class DBConnect_likeNum {
         disconnectDB();
     }
 
+    //为某个单词的有道释义点赞
     public static void likeYoudao(String word){
         connectDB();
         ResultSet rs;
@@ -67,9 +74,11 @@ public class DBConnect_likeNum {
             //statement.executeUpdate("create table if not exists likes(dicName VARCHAR(16) not null, num INTEGER DEFAULT 0, PRIMARY KEY (dicName))");
             String dicName = "youdao";
             rs = statement.executeQuery("select " + dicName + " from likes where word = '"+ word +"'");
+            //若数据库中没有该单词，则添加一条该单词的记录
             if(rs.next() == false){
-                statement.executeUpdate("insert into likes(word, baidu, youdao, bing) values('" + word + "', 1, 0, 0)");
+                statement.executeUpdate("insert into likes(word, baidu, youdao, bing) values('" + word + "', 0, 1, 0)");
             }
+            //若有该单词，则有道的点赞数+1
             else {
                 int likeNum = -1;
                 likeNum = rs.getInt(dicName);
@@ -84,6 +93,7 @@ public class DBConnect_likeNum {
         disconnectDB();
     }
 
+    //为某个单词的必应释义点赞
     public static void likeBing(String word){
         connectDB();
         ResultSet rs;
@@ -92,9 +102,11 @@ public class DBConnect_likeNum {
             //statement.executeUpdate("create table if not exists likes(dicName VARCHAR(16) not null, num INTEGER DEFAULT 0, PRIMARY KEY (dicName))");
             String dicName = "bing";
             rs = statement.executeQuery("select " + dicName + " from likes where word = '"+ word +"'");
+            //若数据库中没有该单词，则添加一条该单词的记录
             if(rs.next() == false){
-                statement.executeUpdate("insert into likes(word, baidu, youdao, bing) values('" + word + "', 1, 0, 0)");
+                statement.executeUpdate("insert into likes(word, baidu, youdao, bing) values('" + word + "', 0, 0, 1)");
             }
+            //若有该单词，则必应的点赞数+1
             else {
                 int likeNum = -1;
                 likeNum = rs.getInt(dicName);
@@ -109,6 +121,7 @@ public class DBConnect_likeNum {
         disconnectDB();
     }
 
+    //返回某个单词的三个词典的点赞数，存放在一个长度为3的int数组中，分别对应百度、有道、必应
     public static int[] getLikes(String word){
         String[] dicName = {"baidu", "youdao", "bing"};
         int dicNum = dicName.length;
@@ -133,6 +146,8 @@ public class DBConnect_likeNum {
         disconnectDB();
         return likes;
     }
+
+    //测试用main函数
     /*public static void main(String[] args) {
         int[] likes = getLikes();
         for(int i = 0; i < likes.length; i++){
