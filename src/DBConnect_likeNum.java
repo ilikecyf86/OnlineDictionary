@@ -76,7 +76,7 @@ public class DBConnect_likeNum {
             rs = statement.executeQuery("select " + dicName + " from likes where word = '"+ word +"'");
             //若数据库中没有该单词，则添加一条该单词的记录
             if(rs.next() == false){
-                statement.executeUpdate("insert into likes(word, baidu, youdao, bing) values('" + word + "', 1, 0, 0)");
+                statement.executeUpdate("insert into likes(word, baidu, youdao, bing) values('" + word + "', 0, 1, 0)");
             }
             //若有该单词，则有道的点赞数+1
             else {
@@ -104,7 +104,7 @@ public class DBConnect_likeNum {
             rs = statement.executeQuery("select " + dicName + " from likes where word = '"+ word +"'");
             //若数据库中没有该单词，则添加一条该单词的记录
             if(rs.next() == false){
-                statement.executeUpdate("insert into likes(word, baidu, youdao, bing) values('" + word + "', 1, 0, 0)");
+                statement.executeUpdate("insert into likes(word, baidu, youdao, bing) values('" + word + "', 0, 0, 1)");
             }
             //若有该单词，则必应的点赞数+1
             else {
