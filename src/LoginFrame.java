@@ -120,7 +120,21 @@ public class LoginFrame extends JFrame {
     }
 
     public boolean judgeUsername(String username) {
-        return username.length() <= 16;
+        if (username.length() > 16)
+            return false;
+        for (int i = 0; i < username.length(); i++) {
+            if (username.charAt(i) >= '0' && username.charAt(i) <= '9')
+                continue;
+            else if (username.charAt(i) >= 'a' && username.charAt(i) <= 'z')
+                continue;
+            else if (username.charAt(i) >= 'A' && username.charAt(i) <= 'Z')
+                continue;
+            else if (username.charAt(i) == '.' && username.charAt(i) == '_')
+                continue;
+            else
+                return false;
+        }
+        return true;
     }
 
     public boolean judgePassword(String password) {
