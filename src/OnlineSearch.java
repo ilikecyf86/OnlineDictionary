@@ -26,7 +26,8 @@ public class OnlineSearch {
                 result += "\n";
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("啊哦，好像连不上百度咯= =");
         }
         return result;
     }
@@ -42,7 +43,8 @@ public class OnlineSearch {
                 result += "\n";
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("啊哦，好像连不上有道咯= =");
         }
         return result;
     }
@@ -68,7 +70,8 @@ public class OnlineSearch {
                 result += hd_if.get(i).text();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("啊哦，好像连不上必应咯= =");
         }
         return result;
     }
