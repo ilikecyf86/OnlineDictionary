@@ -129,7 +129,7 @@ public class LoginFrame extends JFrame {
                 continue;
             else if (username.charAt(i) >= 'A' && username.charAt(i) <= 'Z')
                 continue;
-            else if (username.charAt(i) == '.' && username.charAt(i) == '_')
+            else if (username.charAt(i) == '.' || username.charAt(i) == '_')
                 continue;
             else
                 return false;
