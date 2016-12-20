@@ -527,6 +527,8 @@ public class DictionaryFrame extends JFrame {
                 continue;
             else if (word.charAt(i) >= 'A' && word.charAt(i) <= 'Z')
                 continue;
+            else if (word.charAt(i) == '.' || word.charAt(i) == '-')
+                continue;
             else
                 return false;
         }
